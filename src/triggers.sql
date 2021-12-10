@@ -1,4 +1,3 @@
-
 create or replace function mag_tasks_add() returns trigger
 as $$
 begin
