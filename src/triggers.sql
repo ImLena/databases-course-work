@@ -81,7 +81,9 @@ execute procedure assistant_add();
 
 create or replace function escapee_add() returns setof trigger as $escapee_add$
 begin
-    if exists (select ид_зверек from помощники where ид_зверек = new.ид_беглец) then
+    if exists(select 1 from помощники join задания using (ид_задание) where
+                    new.ид_беглец = помощники.ид_зверек and задания.начало < now()
+                    and задания.конец > now()) then
         delete from помощники where ид_зверек = new.ид_беглец;
     end if;
     return new;
@@ -115,4 +117,20 @@ create trigger mag_tasks_add
     for each row
 execute procedure add_location();
 
+
+create or replace function check_hybrid_kind() returns setof trigger as $check_hybrid_kind$
+begin
+    if  (exists(select 1 from порода_зверька where ид_порода = new.ид_зверек and порода_зверька.гибрид = false and
+            (select count(*) from зверек_вид where ид_зверек = new.ид_зверек) = 1)) then
+        raise exception 'только у гибридов может быть несколько видов';
+        return null;
+    end if;
+    return new;
+end;
+$check_hybrid_kind$ language 'plpgsql';
+
+create trigger check_hybrid_kind
+    before insert or update on зверек_вид
+    for each row
+execute procedure check_hybrid_kind();
 
