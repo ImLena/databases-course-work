@@ -25,7 +25,7 @@ begin
 end;
 $$ language plpgsql;
 
-create or replace function check_energy(id_creature integer) returns integer as $check_hybrid_kind$
+create or replace function check_energy(id_creature integer) returns integer as $check_energy$
     declare
         res integer;
         zeroing timestamp;
@@ -50,4 +50,4 @@ create or replace function check_energy(id_creature integer) returns integer as 
         end if;
         return res;
     end;
-$check_hybrid_kind$ language 'plpgsql';
+$check_energy$ language 'plpgsql';
