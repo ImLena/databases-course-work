@@ -132,3 +132,17 @@ create table результаты_исследований (
                                          результат integer
 );
 
+create or replace function add_animals() returns integer as $$
+declare
+    res integer;
+    i integer;
+begin
+    res := 1;
+    loop
+    insert into зверьки_в_чемодане(ид_чемодан, ид_зверек, ид_локация) values(1, res, 3);
+    res := res + 1;
+    exit when res = 501;
+    end loop;
+    return res;
+end;
+$$ language plpgsql;
