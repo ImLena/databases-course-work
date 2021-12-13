@@ -24,3 +24,30 @@ begin
     return res;
 end;
 $$ language plpgsql;
+
+create or replace function check_energy(id_creature integer) returns integer as $check_hybrid_kind$
+    declare
+        res integer;
+        zeroing timestamp;
+        speed integer;
+        max_energy integer;
+        days integer;
+    begin
+        res := 0;
+        if(select порода_зверька.гибрид = true
+            from зверек join порода_зверька using(ид_порода) where зверек.ид_зверек = id_creature) then
+            select sum(скорость_роста_энергии), обнуление, макс_энергия  into speed, zeroing, max_energy
+                from зверек join порода_зверька
+                    пз on пз.ид_порода = зверек.ид_порода join зверек_вид зв on зверек.ид_зверек = зв.ид_зверек
+                        join виды в on зв.ид_вид = в.название where зверек.ид_зверек = id_creature group by 2, 3;
+            else
+                select скорость_роста_энергии, обнуление, макс_энергия  into speed, zeroing, max_energy
+                from зверек join порода_зверька
+                    пз on пз.ид_порода = зверек.ид_порода join зверек_вид зв on зверек.ид_зверек = зв.ид_зверек
+                            join виды в on зв.ид_вид = в.название where зверек.ид_зверек = id_creature group by 1, 2, 3;
+            days := extract(day from age(current_date::timestamp, zeroing))::integer;
+            res := (speed * days) % max_energy;
+        end if;
+        return res;
+    end;
+$check_hybrid_kind$ language 'plpgsql';
