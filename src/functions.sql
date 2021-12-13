@@ -46,7 +46,7 @@ create or replace function check_energy(id_creature integer) returns integer as 
                     пз on пз.ид_порода = зверек.ид_порода join зверек_вид зв on зверек.ид_зверек = зв.ид_зверек
                             join виды в on зв.ид_вид = в.название where зверек.ид_зверек = id_creature group by 1, 2, 3;
             days := extract(day from age(current_date::timestamp, zeroing))::integer;
-            res := (speed * days) % max_energy;
+            res := ((((speed * days) % max_energy)::float / (max_energy::float)) * 100)::integer;
         end if;
         return res;
     end;
