@@ -51,10 +51,10 @@ create table виды(
 );
 
 create table зверек_вид(
-                           ид_зверек integer not null,
-                           ид_вид text not null,
-                           foreign key (ид_зверек) references зверек(ид_зверек),
-                           foreign key (ид_вид) references виды(название)
+                           ид_порода integer not null,
+                           вид text not null,
+                           foreign key (ид_порода) references порода_зверька(ид_порода),
+                           foreign key (вид) references виды(название)
 );
 
 create table чемодан(
